@@ -7,7 +7,7 @@
 .NOTES
     File Name      : run.ps1
     Author         : Derek Nutile (dereknutile@gmail.com)
-    Prerequisite   : PowerShell V3
+    Prerequisite   : PowerShell V2+
 .LINK
     https://github.com/dereknutile/powershell-scripts
 .EXAMPLE
@@ -17,29 +17,43 @@
     powershell.exe .\run.ps1 -verbose
 #>
 
-# Needed to accept the -Verbose switch
+
+<# -----------------------------------------------------------------------------
+  Needed to accept the '-Verbose' switch.
+----------------------------------------------------------------------------- #>
 [CmdletBinding()]
 Param()
 
-# Variables
+
+<# -----------------------------------------------------------------------------
+  Variables in the script scope.
+----------------------------------------------------------------------------- #>
 $now = Get-Date
 $service = "AdobeARMservice"
 $LogFile = "logfile.log"
 
-# Functions
-function Send-Email ([string]$hostName, [string]$fromEmail, [string]$toEmail, [string]$subject, [string]$body) {
-    $SmtpClient = New-Object system.Net.Mail.SmtpClient($hostName)
-    $MailMessage = New-Object system.Net.Mail.MailMessage($fromEmail, $toEmail, $subject, $body)
-    $SmtpClient.UseDefaultCredentials = 'True'
-    $SmtpClient.Send($MailMessage)
-}
 
-Function Write-ToLog ([string]$entry) {
+<# -----------------------------------------------------------------------------
+  Script functions
+----------------------------------------------------------------------------- #>
+# Usage: Send-Email $SmtpClientHost $MailMessageFrom $MailMessageTo $MailMessageSubject $Body
+# function Send-Email ([string]$hostName, [string]$fromEmail, [string]$toEmail, [string]$subject, [string]$body) {
+#     $SmtpClient = New-Object system.Net.Mail.SmtpClient($hostName)
+#     $MailMessage = New-Object system.Net.Mail.MailMessage($fromEmail, $toEmail, $subject, $body)
+#     $SmtpClient.UseDefaultCredentials = 'True'
+#     $SmtpClient.Send($MailMessage)
+# }
+
+Function Write-ToLogFile ([string]$entry) {
     Write-Verbose -Message $entry
     Add-Content $LogFile -value $entry
 }
 
-Write-ToLog "----- Start Flush: $(Get-Date) -----"
+
+<# -----------------------------------------------------------------------------
+  The meat.
+----------------------------------------------------------------------------- #>
+Write-ToLogFile "----- Start Flush: $(Get-Date) -----"
 
 Write-Verbose -Message "Stopping $($service)..."
 Stop-Service $service
@@ -53,7 +67,4 @@ Get-Service $service | ForEach-Object {
     Write-Verbose -Message "Status: $($_.Status)"
 }
 
-# Send-Email $SmtpClientHost $MailMessageFrom $MailMessageTo $MailMessageSubject $Body
-
-Write-ToLog "----- End Flush: $(Get-Date) -----"
-
+Write-ToLogFile "----- End Flush: $(Get-Date) -----"
