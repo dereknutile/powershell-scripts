@@ -44,27 +44,44 @@ $LogFile = "logfile.log"
 #     $SmtpClient.Send($MailMessage)
 # }
 
+Function Get-Config ([string]$configFile) {
+  $config = Get-Content $configFile -Raw | ConvertFrom-Json
+
+  foreach($val in $config | Get-Member) {
+      if($val.Name -eq "Services"){
+          $val.psobject[0]
+          ForEach-Object -InputObject $val.psobject {
+            Write-Host $_
+          }
+          $services = $val.psobject
+      }
+  }
+  Write-Verbose -Message $services
+}
+
 Function Write-ToLogFile ([string]$entry) {
     Write-Verbose -Message $entry
     Add-Content $LogFile -value $entry
 }
 
 
+Get-Config config.json
+
 <# -----------------------------------------------------------------------------
   The meat.
 ----------------------------------------------------------------------------- #>
-Write-ToLogFile "----- Start Flush: $(Get-Date) -----"
+# Write-ToLogFile "----- Start Flush: $(Get-Date) -----"
 
-Write-Verbose -Message "Stopping $($service)..."
-Stop-Service $service
-Get-Service $service | ForEach-Object {
-    Write-Verbose -Message "Status: $($_.Status)"
-}
+# Write-Verbose -Message "Stopping $($service)..."
+# Stop-Service $service
+# Get-Service $service | ForEach-Object {
+#     Write-Verbose -Message "Status: $($_.Status)"
+# }
 
-Write-Verbose -Message "Starting $($service)..."
-Start-Service $service
-Get-Service $service | ForEach-Object {
-    Write-Verbose -Message "Status: $($_.Status)"
-}
+# Write-Verbose -Message "Starting $($service)..."
+# Start-Service $service
+# Get-Service $service | ForEach-Object {
+#     Write-Verbose -Message "Status: $($_.Status)"
+# }
 
-Write-ToLogFile "----- End Flush: $(Get-Date) -----"
+# Write-ToLogFile "----- End Flush: $(Get-Date) -----"
