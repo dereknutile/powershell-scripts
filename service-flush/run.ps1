@@ -2,10 +2,10 @@
 .SYNOPSIS
     Automated service restarter.
 .DESCRIPTION
-    Reads config.json and stops, starts, logs, and emails the status of a list
+    Reads config.json then stops, starts, logs, and emails the status of a list
     of services.  Note that the config file needs to be named 'config.json' and
     there needs to be a value for the logfile and the services array needs to
-    contain one element.
+    contain at least one element.
 .NOTES
     File Name      : run.ps1
     Author         : Derek Nutile (dereknutile@gmail.com)
@@ -31,8 +31,8 @@ Param()
   Preset variables in the script scope.
 ----------------------------------------------------------------------------- #>
 $now = Get-Date
-$services = @()
-$logfile = ""
+$script:services = @()
+$script:logfile = ""
 
 
 <# -----------------------------------------------------------------------------
@@ -46,20 +46,21 @@ $logfile = ""
 #     $SmtpClient.Send($MailMessage)
 # }
 
-Function Get-Config ([string]$configFile) {
+Function Get-Configuration ([string]$configFile) {
   $result = 0
   $config = Get-Content $configFile -Raw | ConvertFrom-Json
 
+  # set $script:logfile
   if($config.logfile){
     $result++
-    $LogFile = $config.logfile
+    $script:logfile = $config.logfile
   }
 
-  # Gather services
+  # set $script:services
   if($config.services.count -ge 0) {
     $result++
     foreach($val in $config.services) {
-      $services += $val
+      $script:services += $val
       # Write-Host $val
     }
   }
@@ -72,27 +73,29 @@ Function Get-Config ([string]$configFile) {
 
 Function Write-ToLogFile ([string]$entry) {
     Write-Verbose -Message $entry
-    Add-Content $LogFile -value $entry
+    Add-Content $script:logfile -value $entry
 }
 
-
-Get-Config config.json
 
 <# -----------------------------------------------------------------------------
   The meat.
 ----------------------------------------------------------------------------- #>
-# Write-ToLogFile "----- Start Flush: $(Get-Date) -----"
+Get-Configuration config.json
+Write-ToLogFile "----- Starting script: $(Get-Date) -----"
 
-# Write-Verbose -Message "Stopping $($service)..."
-# Stop-Service $service
-# Get-Service $service | ForEach-Object {
-#     Write-Verbose -Message "Status: $($_.Status)"
-# }
+Foreach ($service in $script:services){
 
-# Write-Verbose -Message "Starting $($service)..."
-# Start-Service $service
-# Get-Service $service | ForEach-Object {
-#     Write-Verbose -Message "Status: $($_.Status)"
-# }
+  Write-Verbose -Message "Stopping $($service)..."
+  Stop-Service $service
+  Get-Service $service | ForEach-Object {
+      Write-Verbose -Message "Status: $($_.Status)"
+  }
 
-# Write-ToLogFile "----- End Flush: $(Get-Date) -----"
+  Write-Verbose -Message "Starting $($service)..."
+  Start-Service $service
+  Get-Service $service | ForEach-Object {
+      Write-Verbose -Message "Status: $($_.Status)"
+  }
+}
+
+Write-ToLogFile "----- Ending script: $(Get-Date) -----"
