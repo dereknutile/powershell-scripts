@@ -3,7 +3,9 @@
     Automated service restarter.
 .DESCRIPTION
     Reads config.json and stops, starts, logs, and emails the status of a list
-    of services.
+    of services.  Note that the config file needs to be named 'config.json' and
+    there needs to be a value for the logfile and the services array needs to
+    contain one element.
 .NOTES
     File Name      : run.ps1
     Author         : Derek Nutile (dereknutile@gmail.com)
@@ -26,11 +28,11 @@ Param()
 
 
 <# -----------------------------------------------------------------------------
-  Variables in the script scope.
+  Preset variables in the script scope.
 ----------------------------------------------------------------------------- #>
 $now = Get-Date
-$service = "AdobeARMservice"
-$LogFile = "logfile.log"
+$services = @()
+$logfile = ""
 
 
 <# -----------------------------------------------------------------------------
@@ -45,18 +47,27 @@ $LogFile = "logfile.log"
 # }
 
 Function Get-Config ([string]$configFile) {
+  $result = 0
   $config = Get-Content $configFile -Raw | ConvertFrom-Json
 
-  foreach($val in $config | Get-Member) {
-      if($val.Name -eq "Services"){
-          $val.psobject[0]
-          ForEach-Object -InputObject $val.psobject {
-            Write-Host $_
-          }
-          $services = $val.psobject
-      }
+  if($config.logfile){
+    $result++
+    $LogFile = $config.logfile
   }
-  Write-Verbose -Message $services
+
+  # Gather services
+  if($config.services.count -ge 0) {
+    $result++
+    foreach($val in $config.services) {
+      $services += $val
+      # Write-Host $val
+    }
+  }
+
+  if($result -ne 2){
+    Write-Verbose -Message "There is an error in the configuration file."
+    exit
+  }
 }
 
 Function Write-ToLogFile ([string]$entry) {

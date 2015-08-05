@@ -1,8 +1,9 @@
 {
+  "logfile": "logfile.log",
   "services": [
-    "AdobeARMservice"
+    "AdobeARMservice",
+    "SomeTestService"
   ],
-  "logFile": "logfile.log",
   "email": [
     "dereknutile@gmail.com"
   ]
