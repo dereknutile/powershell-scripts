@@ -15,6 +15,7 @@ Script Details
 #### [Windows Service Flush](id:service-flush)
 ##### 2015 July
 
-Details go here.
+Parses a configuration file (`config.json`) and restarts a list of services and
+logs activity to a log file.  Optionally sends email to recipients in config.
 
 ``` service, email, log, json ```
