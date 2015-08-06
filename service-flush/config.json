@@ -2,7 +2,7 @@
   "logfile": "logfile.log",
   "services": [
     "AdobeARMservice",
-    "SomeTestService"
+    "AdobeUpdateService"
   ],
   "email": [
     "dereknutile@gmail.com"
