@@ -38,13 +38,22 @@ $script:logfile = ""
 <# -----------------------------------------------------------------------------
   Script functions
 ----------------------------------------------------------------------------- #>
-# Usage: Send-Email $SmtpClientHost $MailMessageFrom $MailMessageTo $MailMessageSubject $Body
-# function Send-Email ([string]$hostName, [string]$fromEmail, [string]$toEmail, [string]$subject, [string]$body) {
-#     $SmtpClient = New-Object system.Net.Mail.SmtpClient($hostName)
-#     $MailMessage = New-Object system.Net.Mail.MailMessage($fromEmail, $toEmail, $subject, $body)
-#     $SmtpClient.UseDefaultCredentials = 'True'
-#     $SmtpClient.Send($MailMessage)
-# }
+Function Send-SmtpEmail {
+  # todo: add these variables to the config?
+  $smtpFromEmail = "admin@washco.us"
+  $smtpToRecipients = "dereknutile@hotmail.com"
+  # $smtpCcRecipients = "email,email"
+  # $Attachment = "C:\files\log.txt"
+  $smtpSubject = "Service Flush Log"
+  $Body = "Insert body text here"
+  $SMTPServer = "smtp.gmail.com"
+  $SMTPPort = "587"
+
+
+  Send-MailMessage -From $smtpFromEmail -to $smtpToRecipient -Cc $smtpCcRecipients -Subject $smtpSubject `
+  -Body $Body -SmtpServer $SMTPServer -port $SMTPPort -UseSsl `
+  -Credential (Get-Credential) -Attachments $Attachment
+}
 
 Function Get-Configuration ([string]$configFile) {
   $result = 0
@@ -71,9 +80,34 @@ Function Get-Configuration ([string]$configFile) {
   }
 }
 
+Function Flush-AllServices {
+  Stop-AllServices
+  Start-AllServices
+}
+
+Function Stop-AllServices {
+  Foreach ($service in $script:services){
+    Write-ToLogFile "Stopping $($service)..."
+    Stop-Service $service
+    Get-Service $service | ForEach-Object {
+        Write-ToLogFile "Status: $($service) $($_.Status)"
+    }
+  }
+}
+
+Function Start-AllServices {
+  Foreach ($service in $script:services){
+    Write-ToLogFile "Starting $($service)..."
+    Start-Service $service
+    Get-Service $service | ForEach-Object {
+        Write-ToLogFile "Status: $($service) $($_.Status)"
+    }
+  }
+}
+
 Function Write-ToLogFile ([string]$entry) {
     Write-Verbose -Message $entry
-    Add-Content $script:logfile -value $entry
+    Add-Content $script:logfile -value "$($(Get-Date)): $($entry)"
 }
 
 
@@ -81,21 +115,7 @@ Function Write-ToLogFile ([string]$entry) {
   The meat.
 ----------------------------------------------------------------------------- #>
 Get-Configuration config.json
-Write-ToLogFile "----- Starting script: $(Get-Date) -----"
-
-Foreach ($service in $script:services){
-
-  Write-Verbose -Message "Stopping $($service)..."
-  Stop-Service $service
-  Get-Service $service | ForEach-Object {
-      Write-Verbose -Message "Status: $($_.Status)"
-  }
-
-  Write-Verbose -Message "Starting $($service)..."
-  Start-Service $service
-  Get-Service $service | ForEach-Object {
-      Write-Verbose -Message "Status: $($_.Status)"
-  }
-}
-
-Write-ToLogFile "----- Ending script: $(Get-Date) -----"
+Write-ToLogFile "Starting script"
+Flush-AllServices
+Write-ToLogFile "Ending script"
+Write-ToLogFile "-----------------------------------------------------------"
