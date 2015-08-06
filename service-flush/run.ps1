@@ -87,7 +87,7 @@ Function Flush-AllServices {
 
 Function Stop-AllServices {
   Foreach ($service in $script:services){
-    Write-ToLogFile "Stopping $($service)..."
+    Write-ToLogFile "Stopping $($service) ..."
     Stop-Service $service
     Get-Service $service | ForEach-Object {
         Write-ToLogFile "Status: $($service) $($_.Status)"
@@ -97,7 +97,7 @@ Function Stop-AllServices {
 
 Function Start-AllServices {
   Foreach ($service in $script:services){
-    Write-ToLogFile "Starting $($service)..."
+    Write-ToLogFile "Starting $($service) ..."
     Start-Service $service
     Get-Service $service | ForEach-Object {
         Write-ToLogFile "Status: $($service) $($_.Status)"
@@ -107,7 +107,11 @@ Function Start-AllServices {
 
 Function Write-ToLogFile ([string]$entry) {
     Write-Verbose -Message $entry
-    Add-Content $script:logfile -value "$($(Get-Date)): $($entry)"
+    if($entry.length -gt 0) {
+      Add-Content $script:logfile -value "$($(Get-Date).ToString('yyyy-MM-dd-HH-mm-ss')): $($entry)"
+    } else {
+      Add-Content $script:logfile -value ""
+    }
 }
 
 
@@ -118,4 +122,4 @@ Get-Configuration config.json
 Write-ToLogFile "Starting script"
 Flush-AllServices
 Write-ToLogFile "Ending script"
-Write-ToLogFile "-----------------------------------------------------------"
+Write-ToLogFile ""
