@@ -28,6 +28,17 @@ Param()
 
 
 <# -----------------------------------------------------------------------------
+  Import toolbox.
+----------------------------------------------------------------------------- #>
+. "..\tools\functions.ps1"
+
+# If the client uses Powershell v2, there is no cmdlet for handling json
+if(Get-PowershellVersion -eq 2) {
+  . "..\tools\functions-for-ps-2.ps1"
+}
+
+
+<# -----------------------------------------------------------------------------
   Preset variables in the script scope.
 ----------------------------------------------------------------------------- #>
 $now = Get-Date
@@ -38,28 +49,6 @@ $script:logfile = ""
 <# -----------------------------------------------------------------------------
   Script functions
 ----------------------------------------------------------------------------- #>
-<# Returns the Powershell major version - ex: 2 or 3, or 4, etc. #>
-Function Get-PowershellVersion {
-  return $PSVersionTable.PSVersion.Major
-}
-
-
-<# Powershell 2 does NOT have the ConvertTo-Json commandlet #>
-function ConvertTo-Json20([object] $item){
-    add-type -assembly system.web.extensions
-    $ps_js=new-object system.web.script.serialization.javascriptSerializer
-    return $ps_js.Serialize($item)
-}
-
-
-<# Powershell 2 does NOT have the ConvertFrom-Json commandlet #>
-function ConvertFrom-Json20([object] $item){
-    add-type -assembly system.web.extensions
-    $ps_js=new-object system.web.script.serialization.javascriptSerializer
-    return $ps_js.DeserializeObject($item)
-}
-
-
 Function Send-SmtpEmail {
   # todo: add these variables to the config?
   $smtpFromEmail = "admin@washco.us"
@@ -81,13 +70,8 @@ Function Send-SmtpEmail {
 Function Get-Configuration ([string]$configFile) {
   $result = 0
 
-  # If the client uses Powershell v2, there is no cmdlet for handling json
-  if(Get-PowershellVersion -ge 3) {
-    $config = Get-Content $configFile -Raw | ConvertFrom-Json
-  } else {
-    $configFileRaw = Get-Content $configFile -Raw
-    $config = ConvertFrom-Json20 $configFileRaw
-  }
+  $configFileRaw = Get-Content $configFile -Raw
+  $config = ConvertFrom-Json $configFileRaw
 
   # set $script:logfile
   if($config.logfile){
