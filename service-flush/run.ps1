@@ -38,6 +38,28 @@ $script:logfile = ""
 <# -----------------------------------------------------------------------------
   Script functions
 ----------------------------------------------------------------------------- #>
+<# Returns the Powershell major version - ex: 2 or 3, or 4, etc. #>
+Function Get-PowershellVersion {
+  return $PSVersionTable.PSVersion.Major
+}
+
+
+<# Powershell 2 does NOT have the ConvertTo-Json commandlet #>
+function ConvertTo-Json20([object] $item){
+    add-type -assembly system.web.extensions
+    $ps_js=new-object system.web.script.serialization.javascriptSerializer
+    return $ps_js.Serialize($item)
+}
+
+
+<# Powershell 2 does NOT have the ConvertFrom-Json commandlet #>
+function ConvertFrom-Json20([object] $item){
+    add-type -assembly system.web.extensions
+    $ps_js=new-object system.web.script.serialization.javascriptSerializer
+    return $ps_js.DeserializeObject($item)
+}
+
+
 Function Send-SmtpEmail {
   # todo: add these variables to the config?
   $smtpFromEmail = "admin@washco.us"
@@ -55,9 +77,17 @@ Function Send-SmtpEmail {
   -Credential (Get-Credential) -Attachments $Attachment
 }
 
+
 Function Get-Configuration ([string]$configFile) {
   $result = 0
-  $config = Get-Content $configFile -Raw | ConvertFrom-Json
+
+  # If the client uses Powershell v2, there is no cmdlet for handling json
+  if(Get-PowershellVersion -ge 3) {
+    $config = Get-Content $configFile -Raw | ConvertFrom-Json
+  } else {
+    $configFileRaw = Get-Content $configFile -Raw
+    $config = ConvertFrom-Json20 $configFileRaw
+  }
 
   # set $script:logfile
   if($config.logfile){
