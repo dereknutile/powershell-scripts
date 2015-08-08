@@ -9,7 +9,7 @@
 .NOTES
     File Name      : run.ps1
     Author         : Derek Nutile (dereknutile@gmail.com)
-    Prerequisite   : PowerShell V2+
+    Prerequisite   : PowerShell V3+ (or .net 4 w/system.web.extensions for json)
 .LINK
     https://github.com/dereknutile/powershell-scripts
 .EXAMPLE
