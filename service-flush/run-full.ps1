@@ -90,6 +90,7 @@ Function Start-AllServices {
   }
 }
 
+
 Function Write-ToLogFile ([string]$entry) {
     if($entry.length -gt 0) {
       Write-Verbose -Message $entry

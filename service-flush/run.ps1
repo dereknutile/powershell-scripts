@@ -74,7 +74,7 @@ Function Get-Configuration ([string]$configFile) {
   $config = ConvertFrom-Json $configFileRaw
 
   # set $script:logfile
-  if($config.logfile){
+  if($config.logfile) {
     $result++
     $script:logfile = $config.logfile
   }
@@ -88,7 +88,7 @@ Function Get-Configuration ([string]$configFile) {
     }
   }
 
-  if($result -ne 2){
+  if($result -ne 2) {
     Write-Verbose -Message "There is an error in the configuration file."
     exit
   }
@@ -100,8 +100,9 @@ Function Flush-AllServices {
   Start-AllServices
 }
 
+
 Function Stop-AllServices {
-  Foreach ($service in $script:services){
+  Foreach ($service in $script:services) {
     Write-ToLogFile "Stopping $($service) ..."
     Stop-Service $service
     Get-Service $service | ForEach-Object {
@@ -110,8 +111,9 @@ Function Stop-AllServices {
   }
 }
 
+
 Function Start-AllServices {
-  Foreach ($service in $script:services){
+  Foreach ($service in $script:services) {
     Write-ToLogFile "Starting $($service) ..."
     Start-Service $service
     Get-Service $service | ForEach-Object {
@@ -120,9 +122,10 @@ Function Start-AllServices {
   }
 }
 
+
 Function Write-ToLogFile ([string]$entry) {
-    Write-Verbose -Message $entry
     if($entry.length -gt 0) {
+      Write-Verbose -Message $entry
       Add-Content $script:logfile -value "$($(Get-Date).ToString('yyyy-MM-dd-HH-mm-ss')): $($entry)"
     } else {
       Add-Content $script:logfile -value ""
