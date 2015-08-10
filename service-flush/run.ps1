@@ -70,7 +70,7 @@ Function Send-SmtpEmail {
 Function Get-Configuration ([string]$configFile) {
   $result = 0
 
-  $configFileRaw = Get-Content $configFile -Raw
+  $configFileRaw = (Get-Content $configFile) -join "`n"
   $config = ConvertFrom-Json $configFileRaw
 
   # set $script:logfile
@@ -93,6 +93,7 @@ Function Get-Configuration ([string]$configFile) {
     exit
   }
 }
+
 
 Function Flush-AllServices {
   Stop-AllServices
