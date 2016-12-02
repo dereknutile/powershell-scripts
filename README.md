@@ -12,7 +12,7 @@ Script List
 
 Script Details
 ----------------------------
-#### [Windows Service Flush](id:service-flush)
+#### [Windows Service Flush](id:windows-service-flush)
 ##### 2015 July
 
 Parses a configuration file (`config.json`) and restarts a list of services and
