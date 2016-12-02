@@ -1,25 +1,25 @@
 <#
 .SYNOPSIS
-    Automated service restarter.
+    Legacy automated service restarter.
 .DESCRIPTION
-    Reads config.json then stops, starts, logs, and emails the status of a list
-    of services.  Note that the config file needs to be named 'config.json' and
-    there needs to be a value for the logfile and the services array needs to
-    contain at least one element.
+    Stops, starts, logs, and emails the status of a list of services.  Note that
+    the config file needs to be named 'config.json' and there needs to be a
+    value for the logfile and the services array needs to contain at least one
+    element.
 
     This has the same functionality as the run.ps1 file but does not read a json
-    file (due to lack of support in Powershell v2).
+    file (due to lack of support in Powershell v2).  You must set variables in the $script area below.
 .NOTES
-    File Name      : run-full.ps1
+    File Name      : run-legacy.ps1
     Author         : Derek Nutile (dereknutile@gmail.com)
     Prerequisite   : PowerShell V2+
 .LINK
     https://github.com/dereknutile/powershell-scripts
 .EXAMPLE
-    powershell.exe .\run-full.ps1
+    powershell.exe .\run-legacy.ps1
 .EXAMPLE
     Provide output to the console.
-    powershell.exe .\run-full.ps1 -verbose
+    powershell.exe .\run-legacy.ps1 -verbose
 #>
 
 
