@@ -11,7 +11,7 @@
     "smtpFromEmail": "admin@washco.us",
     "smtpToRecipients": "dereknutile@hotmail.com",
     "smtpCcRecipients": "",
-    "smtpSubject": "Service Flush Log",
+    "smtpSubject": "Log Ripper",
     "Body": "Insert body text here",
     "SMTPServer": "smtp.gmail.com",
     "SMTPPort": "587"
