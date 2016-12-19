@@ -49,51 +49,6 @@ $script:logfile = ""
 <# -----------------------------------------------------------------------------
   Script functions
 ----------------------------------------------------------------------------- #>
-Function Send-SmtpEmail {
-  # todo: add these variables to the config?
-  $smtpFromEmail = "admin@washco.us"
-  $smtpToRecipients = "dereknutile@hotmail.com"
-  # $smtpCcRecipients = "email,email"
-  # $Attachment = "C:\files\log.txt"
-  $smtpSubject = "Service Flush Log"
-  $Body = "Insert body text here"
-  $SMTPServer = "smtp.gmail.com"
-  $SMTPPort = "587"
-
-
-  Send-MailMessage -From $smtpFromEmail -to $smtpToRecipient -Cc $smtpCcRecipients -Subject $smtpSubject `
-  -Body $Body -SmtpServer $SMTPServer -port $SMTPPort -UseSsl `
-  -Credential (Get-Credential) -Attachments $Attachment
-}
-
-
-Function Get-Configuration ([string]$configFile) {
-  $result = 0
-
-  $configFileRaw = (Get-Content $configFile) -join "`n"
-  $config = ConvertFrom-Json $configFileRaw
-
-  # set $script:logfile
-  if($config.logfile) {
-    $result++
-    $script:logfile = $config.logfile
-  }
-
-  # set $script:services
-  if($config.services.count -ge 0) {
-    $result++
-    foreach($val in $config.services) {
-      $script:services += $val
-      # Write-Host $val
-    }
-  }
-
-  if($result -ne 2) {
-    Write-Verbose -Message "There is an error in the configuration file."
-    exit
-  }
-}
-
 
 Function Flush-AllServices {
   Stop-AllServices

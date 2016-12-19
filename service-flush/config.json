@@ -4,7 +4,13 @@
     "AdobeARMservice",
     "AdobeUpdateService"
   ],
-  "email": [
-    "dereknutile@gmail.com"
-  ]
+  "email": [{
+    "smtpFromEmail": "admin@washco.us",
+    "smtpToRecipients": "dereknutile@hotmail.com",
+    "smtpCcRecipients": "",
+    "smtpSubject": "Service Flush Log",
+    "Body": "Insert body text here",
+    "SMTPServer": "smtp.gmail.com",
+    "SMTPPort": "587"
+  }]
 }
