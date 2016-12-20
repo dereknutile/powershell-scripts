@@ -11,52 +11,55 @@
 .LINK
     https://github.com/dereknutile/powershell-scripts
 .EXAMPLE
-    powershell.exe .\run.ps1 logfile output
+    powershell.exe .\run.ps1
+    powershell.exe .\run.ps1 targetDir
+    powershell.exe .\run.ps1 targetDir targetDaysOld
 .EXAMPLE
     Provide output to the console.
-    powershell.exe .\run.ps1 -Verbose
+    powershell.exe .\run.ps1 targetDir targetDaysOld -Verbose
 #>
 
 
 <# -----------------------------------------------------------------------------
-  Needed to accept the '-Verbose' switch.
+  Handle commandline parameters
 ----------------------------------------------------------------------------- #>
 [CmdletBinding()]
-Param()
+Param(
+    [Parameter(Mandatory=$False)]
+    [string]$targetDir = (Get-Item -Path ".\logs" -Verbose).FullName,
+
+    [Parameter(Mandatory=$False)]
+    [string]$targetDaysOld = 30
+)
 
 
 <# -----------------------------------------------------------------------------
   Import toolbox.
 ----------------------------------------------------------------------------- #>
-. "..\tools\functions.ps1"
+. "..\common\functions.ps1"
 
 # If the client uses Powershell v2, there is no cmdlet for handling json
 if(Get-PowershellVersion -eq 2) {
-  . "..\tools\functions-for-ps-2.ps1"
+  . "..\common\functions-for-ps-2.ps1"
 }
 
 
 <# -----------------------------------------------------------------------------
   Set variables.
 ----------------------------------------------------------------------------- #>
-$config = Get-Configuration config.json
-
-# Removed the call from the config because Powershell v2 has issues with reading
-# JSON and the slashes are causing trouble. Example: .\logs is invalid JSON.
-# $targetDir = $config.targetDir
-
-$targetDir = ".\logs"
-$targetDaysOld = (Get-Date).AddDays(-$config.targetDaysOld)
+$targetDateTime = (Get-Date).AddDays(-$targetDaysOld)
 
 
 <# -----------------------------------------------------------------------------
   Script functions
 ----------------------------------------------------------------------------- #>
 Function Remove-Logfiles {
-    Get-ChildItem $targetDir -Recurse | ? {
-        -not $_.PSIsContainer -and $_.CreationTime -lt $targetDaysOld
-    }
-    # } | Remove-Item
+    # Iterate and count
+    $files = Get-ChildItem $targetDir -Recurse | Where-Object { -not $_.PSIsContainer -and $_.LastWriteTime -lt $targetDateTime }
+    $script:count = $files.Count
+
+    # Perform the removal
+    Get-ChildItem $targetDir -Recurse | Where-Object { -not $_.PSIsContainer -and $_.LastWriteTime -lt $targetDateTime } | Remove-Item
 }
 
 
@@ -64,7 +67,8 @@ Function Remove-Logfiles {
   The meat.
 ----------------------------------------------------------------------------- #>
 Write-Host "Starting script"
-Write-Host "Parsing $targetDir ..."
-Write-Host "Removing log files older than $targetDaysOld."
 Remove-Logfiles
+Write-Host "Parsed $targetDir ..."
+Write-Host "Removed log files older than $targetDateTime."
+Write-Host "$script:count files removed"
 Write-Host "Ending script"
