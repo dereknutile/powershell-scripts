@@ -1,0 +1,11 @@
+{
+  "email": [{
+    "smtpFromEmail": "admin@washco.us",
+    "smtpToRecipients": "dereknutile@hotmail.com",
+    "smtpCcRecipients": "",
+    "smtpSubject": "Log Roller",
+    "Body": "Insert body text here",
+    "SMTPServer": "smtp.gmail.com",
+    "SMTPPort": "587"
+  }]
+}
