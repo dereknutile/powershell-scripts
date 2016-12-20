@@ -21,7 +21,7 @@
 
 
 <# -----------------------------------------------------------------------------
-  Handle commandline parameters
+  Handle commandline parameters and verbosity
 ----------------------------------------------------------------------------- #>
 [CmdletBinding()]
 Param()
@@ -41,9 +41,10 @@ if(Get-PowershellVersion -eq 2) {
 <# -----------------------------------------------------------------------------
   Preset variables in the script scope.
 ----------------------------------------------------------------------------- #>
+$config = Get-Configuration config.json
 $now = Get-Date
-$script:services = @()
-$script:logfile = ""
+# $config.services = @()
+# $config.logfile = ""
 
 
 <# -----------------------------------------------------------------------------
@@ -57,7 +58,7 @@ Function Flush-AllServices {
 
 
 Function Stop-AllServices {
-  Foreach ($service in $script:services) {
+  Foreach ($service in $config.services) {
     Write-ToLogFile "Stopping $($service) ..."
     Stop-Service $service
     Get-Service $service | ForEach-Object {
@@ -68,7 +69,7 @@ Function Stop-AllServices {
 
 
 Function Start-AllServices {
-  Foreach ($service in $script:services) {
+  Foreach ($service in $config.services) {
     Write-ToLogFile "Starting $($service) ..."
     Start-Service $service
     Get-Service $service | ForEach-Object {
@@ -81,9 +82,9 @@ Function Start-AllServices {
 Function Write-ToLogFile ([string]$entry) {
     if($entry.length -gt 0) {
       Write-Verbose -Message $entry
-      Add-Content $script:logfile -value "$($(Get-Date).ToString('yyyy-MM-dd-HH-mm-ss')): $($entry)"
+      Add-Content $config.logfile -value "$($(Get-Date).ToString('yyyy-MM-dd-HH-mm-ss')): $($entry)"
     } else {
-      Add-Content $script:logfile -value ""
+      Add-Content $config.logfile -value ""
     }
 }
 
@@ -91,7 +92,6 @@ Function Write-ToLogFile ([string]$entry) {
 <# -----------------------------------------------------------------------------
   Run
 ----------------------------------------------------------------------------- #>
-Get-Configuration config.json
 Write-ToLogFile "Starting script"
 Flush-AllServices
 Write-ToLogFile "Ending script"
