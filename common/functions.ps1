@@ -68,6 +68,19 @@ Function Var-Dump ($var) {
 }
 
 
+Function Read-IniFile ([string]$iniFile) {
+    Get-Content $iniFile | foreach-object -begin {
+        $setting=@{}
+    } -process {
+        $k = [regex]::split($_,'=')
+        if(($k[0].CompareTo("") -ne 0) -and ($k[0].StartsWith("[") -ne $True)) {
+            $setting.Add($k[0], $k[1])
+        } 
+    }
+    return $setting
+}
+
+
 Function Send-SmtpEmail {
     # todo: add these variables to the config?
     $smtpFromEmail = "admin@washco.us"
