@@ -16,25 +16,25 @@
     powershell.exe .\run.ps1
 .EXAMPLE
     Provide output to the console.
-    powershell.exe .\run.ps1 -verbose
+    powershell.exe .\run.ps1 -Verbose
 #>
 
 
 <# -----------------------------------------------------------------------------
-  Needed to accept the '-Verbose' switch.
+  Handle commandline parameters
 ----------------------------------------------------------------------------- #>
 [CmdletBinding()]
 Param()
 
 
 <# -----------------------------------------------------------------------------
-  Import toolbox.
+  Import common functions.
 ----------------------------------------------------------------------------- #>
-. "..\tools\functions.ps1"
+. "..\common\functions.ps1"
 
 # If the client uses Powershell v2, there is no cmdlet for handling json
 if(Get-PowershellVersion -eq 2) {
-  . "..\tools\functions-for-ps-2.ps1"
+  . "..\common\functions-for-ps-2.ps1"
 }
 
 
@@ -89,7 +89,7 @@ Function Write-ToLogFile ([string]$entry) {
 
 
 <# -----------------------------------------------------------------------------
-  The meat.
+  Run
 ----------------------------------------------------------------------------- #>
 Get-Configuration config.json
 Write-ToLogFile "Starting script"
