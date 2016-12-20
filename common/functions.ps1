@@ -35,39 +35,6 @@ Function Get-Configuration ([string]$configFile) {
 }
 
 
-Function Test-Get-Configuration ([string]$configFile) {
-    $result = 0
-
-    $configFileRaw = (Get-Content $configFile) -join "`n"
-    $config = ConvertFrom-Json $configFileRaw
-
-    # set $script:logfile
-    if($config.logfile) {
-        $result++
-        $script:logfile = $config.logfile
-    }
-
-    # set $script:services
-    if($config.services.count -ge 0) {
-        $result++
-        foreach($val in $config.services) {
-            $script:services += $val
-            # Write-Host $val
-        }
-    }
-
-    if($result -ne 2) {
-        Write-Verbose -Message "There is an error in the configuration file."
-        exit
-    }
-}
-
-
-Function Var-Dump ($var) {
-    Write-Host ($var | Format-Table | Out-String)
-}
-
-
 Function Read-IniFile ([string]$iniFile) {
     Get-Content $iniFile | foreach-object -begin {
         $setting=@{}
