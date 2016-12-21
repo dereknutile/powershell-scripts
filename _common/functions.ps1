@@ -27,7 +27,7 @@ Function Get-PowershellVersion {
 
 
 <# -----------------------------------------------------------------------------
-    Returns the contents of a configuration file in JSON format
+    Returns the contents of a configuration file in JSON format.
 ----------------------------------------------------------------------------- #>
 Function Get-Configuration ([string]$file) {
     $fileContents = (Get-Content $file) -join "`n"
@@ -37,7 +37,7 @@ Function Get-Configuration ([string]$file) {
 
 
 <# -----------------------------------------------------------------------------
-    Returns the contents of a configuration file in INI format
+    Returns the contents of a configuration file in INI format.
 ----------------------------------------------------------------------------- #>
 Function Get-IniFile ([string]$file) {
     Get-Content $file | foreach-object -begin {
@@ -53,7 +53,36 @@ Function Get-IniFile ([string]$file) {
 
 
 <# -----------------------------------------------------------------------------
-    Sends an email
+    Write a string to a logfile (defaults to logfile.log in current directory).
+----------------------------------------------------------------------------- #>
+Function Write-Log ([string]$string, [switch]$addDate=$True, [string]$file = ".\logfile.log") {
+    # Prefix the line with a date-timestamp if the string isn't blank
+    if($string.length -gt 0) {
+        Write-Verbose -Message $string
+
+        # Set the date prefix is present
+        if($addDate) {
+            $string = "$($(Get-Date).ToString('yyyy-MM-dd-HH-mm-ss')): $string"
+        }
+
+        # Create the logfile if it doesn't exist
+        if (!(Test-Path $file)) {
+            New-Item -path $file -type "file"
+            Write-Verbose -Message "File $file created."
+        }
+
+        # Write the string to the logfile
+        Add-Content $file -value "$string" -Force
+
+    # Insert an empty line if the string is blank
+    } else {
+        Add-Content $file -value ""
+    }
+}
+
+
+<# -----------------------------------------------------------------------------
+    Sends an email.
 ----------------------------------------------------------------------------- #>
 # NOTE: Non-functional!
 # TODO: accept an array of variables from a config
