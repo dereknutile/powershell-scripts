@@ -6,14 +6,5 @@
       "CFML Engine Started:",
       "Page URL:",
       "Args:"
-  ],
-  "email": [{
-    "smtpFromEmail": "admin@washco.us",
-    "smtpToRecipients": "dereknutile@hotmail.com",
-    "smtpCcRecipients": "",
-    "smtpSubject": "Log Ripper",
-    "Body": "Insert body text here",
-    "SMTPServer": "smtp.gmail.com",
-    "SMTPPort": "587"
-  }]
+  ]
 }

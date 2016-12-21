@@ -1,4 +1,8 @@
-<#
+<# -----------------------------------------------------------------------------
+    WARNING: THIS SCRIPT DELETES FILES, USE WITH CAUTION!
+----------------------------------------------------------------------------- #>
+
+<# -----------------------------------------------------------------------------
 .SYNOPSIS
     Logfile roller.
 .DESCRIPTION
@@ -7,7 +11,8 @@
 .NOTES
     File Name      : run.ps1
     Author         : Derek Nutile (dereknutile@gmail.com)
-    Prerequisite   : PowerShell V3+ (or .net 4 w/system.web.extensions for json)
+    Prerequisite   : PowerShell v3
+                     (can use v2 if .net 4 w/system.web.extensions is installed)
 .LINK
     https://github.com/dereknutile/powershell-scripts
 .EXAMPLE
@@ -17,11 +22,11 @@
 .EXAMPLE
     Provide output to the console.
     powershell.exe .\run.ps1 targetDir targetDaysOld -Verbose
-#>
+----------------------------------------------------------------------------- #>
 
 
 <# -----------------------------------------------------------------------------
-  Handle commandline parameters
+    Handle commandline parameters
 ----------------------------------------------------------------------------- #>
 [CmdletBinding()]
 Param(
@@ -34,24 +39,24 @@ Param(
 
 
 <# -----------------------------------------------------------------------------
-  Import toolbox.
+    Import common functions.
 ----------------------------------------------------------------------------- #>
 . "..\_common\functions.ps1"
 
 # If the client uses Powershell v2, there is no cmdlet for handling json
 if(Get-PowershellVersion -eq 2) {
-  . "..\_common\functions-for-ps-2.ps1"
+    . "..\_common\functions-for-ps-2.ps1"
 }
 
 
 <# -----------------------------------------------------------------------------
-  Set variables.
+    Set variables.
 ----------------------------------------------------------------------------- #>
 $targetDateTime = (Get-Date).AddDays(-$targetDaysOld)
 
 
 <# -----------------------------------------------------------------------------
-  Script functions
+    Script functions
 ----------------------------------------------------------------------------- #>
 Function Remove-Logfiles {
     # Iterate and count
@@ -64,7 +69,7 @@ Function Remove-Logfiles {
 
 
 <# -----------------------------------------------------------------------------
-  The meat.
+    Run.
 ----------------------------------------------------------------------------- #>
 Write-Host "Starting script"
 Remove-Logfiles

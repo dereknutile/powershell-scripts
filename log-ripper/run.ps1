@@ -1,4 +1,4 @@
-<#
+<# -----------------------------------------------------------------------------
 .SYNOPSIS
     Logfile ripper.
 .DESCRIPTION
@@ -12,36 +12,36 @@
 .LINK
     https://github.com/dereknutile/powershell-scripts
 .EXAMPLE
-    powershell.exe .\run.ps1 logfile output
+    powershell.exe .\run.ps1
 .EXAMPLE
     Provide output to the console.
     powershell.exe .\run.ps1 -Verbose
-#>
+----------------------------------------------------------------------------- #>
 
 
 <# -----------------------------------------------------------------------------
-  Needed to accept the '-Verbose' switch.
+    Handle commandline parameters
 ----------------------------------------------------------------------------- #>
 [CmdletBinding()]
 Param()
 
 
 <# -----------------------------------------------------------------------------
-  Import toolbox.
+    Import common functions.
 ----------------------------------------------------------------------------- #>
 . "..\_common\functions.ps1"
 
 # If the client uses Powershell v2, there is no cmdlet for handling json
 if(Get-PowershellVersion -eq 2) {
-  . "..\_common\functions-for-ps-2.ps1"
+    . "..\_common\functions-for-ps-2.ps1"
 }
 
 
 <# -----------------------------------------------------------------------------
-  Set variables.
+    Set variables.
 ----------------------------------------------------------------------------- #>
 $config = Get-Configuration config.json
-$inputFile = "C:\Users\derekn\dev\powershell-scripts\log-ripper\input.log"
+$inputFile = "input.log"
 $outputFile = $config.logfile
 $attributes = $config.attributes
 $outputString = ""
@@ -49,7 +49,12 @@ $counter = 0
 
 
 <# -----------------------------------------------------------------------------
-  Script functions
+    Script functions
+----------------------------------------------------------------------------- #>
+
+
+<# -----------------------------------------------------------------------------
+    Run.
 ----------------------------------------------------------------------------- #>
 $io = [System.IO.File]::OpenText($inputFile)
 while($null -ne ($line = $io.ReadLine())) {
@@ -63,9 +68,5 @@ while($null -ne ($line = $io.ReadLine())) {
 }
 $io.Close
 
-
-<# -----------------------------------------------------------------------------
-  The meat.
------------------------------------------------------------------------------ #>
 $outputString | Set-Content $outputFile
 Write-Host "$counter lines parsed from $inputFile."
