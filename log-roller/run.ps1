@@ -36,11 +36,11 @@ Param(
 <# -----------------------------------------------------------------------------
   Import toolbox.
 ----------------------------------------------------------------------------- #>
-. "..\common\functions.ps1"
+. "..\_common\functions.ps1"
 
 # If the client uses Powershell v2, there is no cmdlet for handling json
 if(Get-PowershellVersion -eq 2) {
-  . "..\common\functions-for-ps-2.ps1"
+  . "..\_common\functions-for-ps-2.ps1"
 }
 
 
