@@ -22,14 +22,14 @@
 
 
 <# -----------------------------------------------------------------------------
-  Handle commandline parameters and verbosity
+    Handle commandline parameters and verbosity
 ----------------------------------------------------------------------------- #>
 [CmdletBinding()]
 Param()
 
 
 <# -----------------------------------------------------------------------------
-  Import common functions.
+    Import common functions.
 ----------------------------------------------------------------------------- #>
 . "..\_common\functions.ps1"
 
@@ -40,7 +40,7 @@ if(Get-PowershellVersion -eq 2) {
 
 
 <# -----------------------------------------------------------------------------
-  Preset variables in the script scope.
+    Preset variables in the script scope.
 ----------------------------------------------------------------------------- #>
 $config = Get-Configuration config.json
 $now = Get-Date
@@ -49,51 +49,44 @@ $now = Get-Date
 
 
 <# -----------------------------------------------------------------------------
-  Script functions
+    Script functions
 ----------------------------------------------------------------------------- #>
 
 Function Flush-AllServices {
-  Stop-AllServices
-  Start-AllServices
+    Write-Log "-----------------------------------------------------------"
+    Write-Log "Starting service-flush script"
+
+    Stop-AllServices
+    Start-AllServices
+    
+    Write-Log "Ending service-flush script"
+    Write-Log "-----------------------------------------------------------"
+    Write-Log ""
 }
 
 
 Function Stop-AllServices {
-  Foreach ($service in $config.services) {
-    Write-ToLogFile "Stopping $($service) ..."
-    Stop-Service $service
-    Get-Service $service | ForEach-Object {
-        Write-ToLogFile "Status: $($service) $($_.Status)"
+    Foreach ($service in $config.services) {
+        Write-Log "Stopping $($service) ..."
+        Stop-Service $service
+        Get-Service $service | ForEach-Object {
+            Write-Log "Status: $($service) $($_.Status)"
+        }
     }
-  }
 }
 
 
 Function Start-AllServices {
-  Foreach ($service in $config.services) {
-    Write-ToLogFile "Starting $($service) ..."
-    Start-Service $service
-    Get-Service $service | ForEach-Object {
-        Write-ToLogFile "Status: $($service) $($_.Status)"
-    }
-  }
-}
-
-
-Function Write-ToLogFile ([string]$entry) {
-    if($entry.length -gt 0) {
-      Write-Verbose -Message $entry
-      Add-Content $config.logfile -value "$($(Get-Date).ToString('yyyy-MM-dd-HH-mm-ss')): $($entry)"
-    } else {
-      Add-Content $config.logfile -value ""
+    Foreach ($service in $config.services) {
+        Write-Log "Starting $($service) ..."
+        Start-Service $service
+        Get-Service $service | ForEach-Object {
+            Write-Log "Status: $($service) $($_.Status)"
+        }
     }
 }
-
 
 <# -----------------------------------------------------------------------------
-  Run.
+    Run.
 ----------------------------------------------------------------------------- #>
-Write-ToLogFile "Starting script"
 Flush-AllServices
-Write-ToLogFile "Ending script"
-Write-ToLogFile ""
