@@ -1,4 +1,4 @@
-<#
+<# -----------------------------------------------------------------------------
 .SYNOPSIS
     Powershell 2.0 missing functions
 .DESCRIPTION
@@ -13,24 +13,25 @@
     https://github.com/dereknutile/powershell-scripts
 .EXAMPLE
     Include this file in your script, then you can call functions from it.
-    . "C:\path\to\tools\functions-for-ps-2.ps1"
-#>
+    . ".\path\to\functions-for-ps-2.ps1"
+----------------------------------------------------------------------------- #>
 
 
 <# -----------------------------------------------------------------------------
-  Functions
+    Powershell 2 does NOT have the ConvertTo-Json commandlet
 ----------------------------------------------------------------------------- #>
-<# Powershell 2 does NOT have the ConvertTo-Json commandlet #>
-function ConvertTo-Json ([object] $item) {
+function ConvertTo-Json ([object]$object) {
     add-type -assembly system.web.extensions
     $ps_js=new-object system.web.script.serialization.javascriptSerializer
-    return $ps_js.Serialize($item)
+    return $ps_js.Serialize($object)
 }
 
 
-<# Powershell 2 does NOT have the ConvertFrom-Json commandlet #>
-function ConvertFrom-Json ([object] $item) {
+<# -----------------------------------------------------------------------------
+    Powershell 2 does NOT have the ConvertFrom-Json commandlet
+----------------------------------------------------------------------------- #>
+function ConvertFrom-Json ([object]$object) {
     add-type -assembly system.web.extensions
     $ps_js=new-object system.web.script.serialization.javascriptSerializer
-    return $ps_js.DeserializeObject($item)
+    return $ps_js.DeserializeObject($object)
 }
