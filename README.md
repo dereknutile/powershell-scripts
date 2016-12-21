@@ -14,11 +14,28 @@ Development scripts for learning and trail-testing.  Each script should use a na
 ### ```.\_common```
 This is where all common reusable code and data should be kept.
 
-## Library
+## Modules
 
+* [IIS Rewrite Rules](#iis-rewrite-rules)
+* [Log Ripper](#log-ripper)
+* [Log Roller](#log-roller)
 * [Service Flush](#service-flush)
 
 -----
+### [IIS Rewrite Rules](id:iis-rewrite-rules)
+
+Tags: ``` iis-rewrite-rules ```
+Purpose: Reads a csv file with IIS rules, applies those rules to supplied server and website.
+
+### [Log Ripper](id:log-ripper)
+
+Tags: ``` log-ripper ```
+Purpose: Reads config.json to gather an array of attributes to search for, then opens a log file and reads it line-by-line writing out only the matching criteria to an output file.
+
+### [Log Roller](id:log-roller)
+
+Tags: ``` log-roller ```
+Purpose: Reads config.json to get the target directory where log files would be kept as well as the value for how many days back to start removing items.
 
 ### [Service Flush](id:service-flush)
 
