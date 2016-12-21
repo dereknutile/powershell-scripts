@@ -1,10 +1,9 @@
 {
-  "logfile": "logfile.log",
   "attributes": [
     "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",
-      "Request ID:",
-      "CFML Engine Started:",
-      "Page URL:",
-      "Args:"
+    "Request ID:",
+    "CFML Engine Started:",
+    "Page URL:",
+    "Args:"
   ]
 }
