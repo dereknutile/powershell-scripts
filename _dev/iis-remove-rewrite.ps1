@@ -1,19 +1,19 @@
 <# -----------------------------------------------------------------------------
 .SYNOPSIS
-    Testing: Restart services
+    Testing: Remove IIS rewrite by name
 .DESCRIPTION
-    Restarts the Spooler service on the local machine.
+    Simple example of parsing command line paramters and passing through to variables.
 .NOTES
-    File Name      : restart-service.ps1
+    File Name      : iis-remove-rewrite.ps1
     Author         : Derek Nutile (dereknutile@gmail.com)
     Prerequisite   : PowerShell v2
 .LINK
     https://github.com/dereknutile/powershell-scripts
 .EXAMPLE
-    powershell.exe .\restart-service.ps1
+    powershell.exe .\iis-remove-rewrite.ps1
 .EXAMPLE
     Provide output to the console.
-    powershell.exe .\restart-service.ps1 -Verbose
+    powershell.exe .\iis-remove-rewrite.ps1 -Verbose
 ----------------------------------------------------------------------------- #>
 
 
@@ -27,18 +27,11 @@ Param()
 <# -----------------------------------------------------------------------------
 	Preset variables in the script scope.
 ----------------------------------------------------------------------------- #>
-$serviceName = "Spooler"
+$site = "iis:\sites\Default Web Site"
+$ruleName = "This is a test"
 
 
 <# -----------------------------------------------------------------------------
-	Run.
+	Run
 ----------------------------------------------------------------------------- #>
-Write-Output "Restarting $serviceName Service ..."
-
-Get-Service | Where {$_.Name -Match $serviceName}
-
-Get-Service $serviceName | Stop-Service -Force
-Get-Service | Where {$_.Name -Match $serviceName}
-
-Get-Service $serviceName | Start-Service
-Get-Service | Where {$_.Name -Match $serviceName}
+Clear-WebConfiguration -pspath $site -filter "/system.webserver/rewrite/rules/rule[@name='$ruleName']"

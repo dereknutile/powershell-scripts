@@ -1,24 +1,24 @@
 <# -----------------------------------------------------------------------------
 .SYNOPSIS
-    Testing: Restart services
+    Testfile: Add a rule to IIS
 .DESCRIPTION
-    Restarts the Spooler service on the local machine.
+    Add a rule to local IIS web server.
 .NOTES
-    File Name      : restart-service.ps1
+    File Name      : iis-add-rewrite.ps1
     Author         : Derek Nutile (dereknutile@gmail.com)
     Prerequisite   : PowerShell v2
 .LINK
     https://github.com/dereknutile/powershell-scripts
 .EXAMPLE
-    powershell.exe .\restart-service.ps1
+    powershell.exe .\iis-add-rewrite.ps1
 .EXAMPLE
     Provide output to the console.
-    powershell.exe .\restart-service.ps1 -Verbose
+    powershell.exe .\iis-add-rewrite.ps1 -Verbose
 ----------------------------------------------------------------------------- #>
 
 
 <# -----------------------------------------------------------------------------
-	Handle commandline parameters and verbosity
+    Handle commandline parameters and verbosity
 ----------------------------------------------------------------------------- #>
 [CmdletBinding()]
 Param()
@@ -27,18 +27,18 @@ Param()
 <# -----------------------------------------------------------------------------
 	Preset variables in the script scope.
 ----------------------------------------------------------------------------- #>
-$serviceName = "Spooler"
+$site = "iis:\sites\Default Web Site"
+$ruleName = "PowerShell Made This"
 
 
 <# -----------------------------------------------------------------------------
-	Run.
+    Run
 ----------------------------------------------------------------------------- #>
-Write-Output "Restarting $serviceName Service ..."
+Add-WebConfigurationProperty -pspath $site -filter "system.webServer/rewrite/rules" -name "." -value @{
+    name="$ruleName";
+    patternSyntax='Regular Expressions';
+     stopProcessing='True';
+}
 
-Get-Service | Where {$_.Name -Match $serviceName}
-
-Get-Service $serviceName | Stop-Service -Force
-Get-Service | Where {$_.Name -Match $serviceName}
-
-Get-Service $serviceName | Start-Service
-Get-Service | Where {$_.Name -Match $serviceName}
+Set-WebConfigurationProperty -pspath $site -filter "/system.webserver/rewrite/rules/rule[@name='$ruleName']/match" -name "." -value @{url='test.html';ignoreCase='True';} 
+Set-WebConfigurationProperty -pspath $site -filter "/system.webserver/rewrite/rules/rule[@name='$ruleName']/action" -name "." -value @{ type="Rewrite"; url='destination.html';} 
