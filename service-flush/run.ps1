@@ -1,4 +1,4 @@
-﻿<#
+﻿<# -----------------------------------------------------------------------------
 .SYNOPSIS
     Automated service restarter.
 .DESCRIPTION
@@ -9,7 +9,8 @@
 .NOTES
     File Name      : run.ps1
     Author         : Derek Nutile (dereknutile@gmail.com)
-    Prerequisite   : PowerShell V3+ (or .net 4 w/system.web.extensions for json)
+    Prerequisite   : PowerShell v3
+                     (can use v2 if .net 4 w/system.web.extensions is installed)
 .LINK
     https://github.com/dereknutile/powershell-scripts
 .EXAMPLE
@@ -17,7 +18,7 @@
 .EXAMPLE
     Provide output to the console.
     powershell.exe .\run.ps1 -Verbose
-#>
+----------------------------------------------------------------------------- #>
 
 
 <# -----------------------------------------------------------------------------
@@ -90,7 +91,7 @@ Function Write-ToLogFile ([string]$entry) {
 
 
 <# -----------------------------------------------------------------------------
-  Run
+  Run.
 ----------------------------------------------------------------------------- #>
 Write-ToLogFile "Starting script"
 Flush-AllServices
