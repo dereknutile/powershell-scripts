@@ -1,0 +1,2 @@
+Name,Pattern,Type,Destination
+Test Google Rewrite,^goog$,Rewrite,www.google.com

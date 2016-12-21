@@ -1,0 +1,3 @@
+# Ignore log files in the script directory.
+*.log
+*.csv
