@@ -1,2 +1,2 @@
-Name,Pattern,Type,Destination
-Test Google Rewrite,^goog$,Rewrite,www.google.com
+PatternSyntax,StopProcessing,Name,Pattern,Type,RewriteUrl
+Regular Expressions,TRUE,Test Google Rewrite,^goog$,Rewrite,www.google.com
