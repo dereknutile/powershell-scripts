@@ -58,7 +58,9 @@ if(Get-PowershellVersion -eq 2) {
     Set variables.
 ----------------------------------------------------------------------------- #>
 $now = Get-Date
-$rulesCounter = 0
+$totalRulesProcessed = 0
+$totalRulesDeleted = 0
+$totalRulesAdded = 0
 $site = "iis:\sites\$webSiteName"
 
 <# -----------------------------------------------------------------------------
@@ -66,14 +68,28 @@ $site = "iis:\sites\$webSiteName"
 ----------------------------------------------------------------------------- #>
 Function Parse-CsvFile {
     Import-CSV $script:csvFile | Foreach-Object { 
-        $script:rulesCounter++
+        $script:totalRulesProcessed++
 
+        # Force will delete if exists, then add
         if($Force){
-            Delete-IisRewrite $_.Name
-        }
+            if(Rewrite-Exists $_.Name){
+                Delete-IisRewrite $_.Name
+            }
+            Add-IisRewrite $_.PatternSyntax $_.StopProcessing $_.Name $_.Pattern $_.Type $_.IgnoreCase $_.RewriteUrl
 
-        Add-IisRewrite $_.PatternSyntax $_.StopProcessing $_.Name $_.Pattern $_.Type $_.IgnoreCase $_.RewriteUrl
+        # No Force means only add if it doesn't exist
+        } else {
+            if(-Not (Rewrite-Exists $_.Name)){
+                Add-IisRewrite $_.PatternSyntax $_.StopProcessing $_.Name $_.Pattern $_.Type $_.IgnoreCase $_.RewriteUrl
+            }
+        }
     }
+}
+
+Function Rewrite-Exists ([string]$name){
+    $exists = Get-WebConfigurationProperty -pspath $script:site -filter "/system.webserver/rewrite/rules/rule[@name='$name']" -name "."
+    
+    return $exists
 }
 
 Function Add-IisRewrite (
@@ -95,11 +111,15 @@ Function Add-IisRewrite (
     Set-WebConfigurationProperty -pspath $script:site -filter "/system.webserver/rewrite/rules/rule[@name='$name']/match" -name "." -value @{ url="$pattern";ignoreCase="$ignoreCase"; }
 
     Set-WebConfigurationProperty -pspath $script:site -filter "/system.webserver/rewrite/rules/rule[@name='$name']/action" -name "." -value @{ type="$type"; url="$RewriteUrl";} 
+
+    Write-Log "Added rule: $name"
+    $script:totalRulesAdded++
 }
 
-Function Delete-IisRewrite ([string]$ruleName) {
-    Clear-WebConfiguration -pspath $script:site -filter "/system.webserver/rewrite/rules/rule[@name='$ruleName']"
-    Write-Log "Deleted rule: $ruleName"
+Function Delete-IisRewrite ([string]$name) {
+    Clear-WebConfiguration -pspath $script:site -filter "/system.webserver/rewrite/rules/rule[@name='$name']"
+    Write-Log "Deleted rule: $name"
+    $script:totalRulesDeleted++
 }
 
 Function Process-CsvFile ([string]$file) {
@@ -113,7 +133,9 @@ Write-Log "-----------------------------------------------------------"
 Write-Log "Start import of $csvFile."
 Write-Log "Processing for server: $serverName"
 Process-CsvFile
-Write-Log "$rulesCounter rules processed."
+Write-Log "$totalRulesProcessed rules processed."
+Write-Log "$totalRulesAdded rules added."
+Write-Log "$totalRulesDeleted rules deleted."
 Write-Log "End of Import"
 Write-Log "-----------------------------------------------------------"
 Write-Log ""
