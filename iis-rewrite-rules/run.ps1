@@ -31,7 +31,6 @@ Param(
 
     [Parameter(Mandatory=$False)]
     [string]$csvFile = (Get-Item -Path ".\rules.csv" -Verbose).FullName,
-    # [string]$csvFile = (Get-Item -Path ".\rules.example" -Verbose).FullName,
 
     [Parameter(Mandatory=$False)]
     [string]$webSiteName = "Default Web Site",
