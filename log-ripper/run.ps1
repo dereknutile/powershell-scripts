@@ -36,8 +36,8 @@ Param(
 <# -----------------------------------------------------------------------------
     Import common functions.
 ----------------------------------------------------------------------------- #>
-. "..\_common\functions.ps1"
-if(Get-PowershellVersion -eq 2) { . "..\_common\functions-for-ps-2.ps1" }
+$scriptPath = Split-Path -Parent -Path $MyInvocation.MyCommand.Definition
+. "$scriptPath\..\_common\functions.ps1"
 
 
 <# -----------------------------------------------------------------------------
@@ -70,21 +70,10 @@ Function Parse-File ([string]$file)  {
     $script:outputString = $result
 }
 
+
 <# -----------------------------------------------------------------------------
     Run.
 ----------------------------------------------------------------------------- #>
-# $io = [System.IO.File]::OpenText($inputFile)
-# while($null -ne ($line = $io.ReadLine())) {
-#     $counter++;
-#     foreach ($attribute in $attributes) {
-#         if($line.Contains($attribute)){
-#             $trimmedLine = $line.Trim()
-#             $outputString = "$outputString$trimmedLine`n"
-#         }
-#     }
-# }
-# $io.Close
-
 Parse-File $inputFile
 $outputString | Set-Content $outputFile
 Write-Host "$counter lines parsed with $hits matches from $inputFile."
