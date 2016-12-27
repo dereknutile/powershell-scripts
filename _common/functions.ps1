@@ -17,6 +17,7 @@
     if(Get-PowershellVersion -eq 2) { do stuff ... }
 ----------------------------------------------------------------------------- #>
 
+$functionsPath = Split-Path -Parent -Path $MyInvocation.MyCommand.Definition
 
 <# -----------------------------------------------------------------------------
     Returns the Powershell major version - ex: 2 or 3, or 4, etc.
@@ -53,16 +54,22 @@ Function Get-IniFile ([string]$file) {
 
 
 <# -----------------------------------------------------------------------------
-    Write a string to a logfile (defaults to logfile.log in current directory).
+    Write a string to a logfile (defaults to logfile.log in \logs directory).
 ----------------------------------------------------------------------------- #>
-Function Write-Log ([string]$string, [switch]$addDate=$True, [string]$file = ".\logfile.log") {
+Function Write-Log ([string]$string, [string]$file, [switch]$addDate=$True) {
     # Prefix the line with a date-timestamp if the string isn't blank
     if($string.length -gt 0) {
+        $date = $(Get-Date).ToString('yyyy-MM-dd')
+        $dateTime = $(Get-Date).ToString('yyyy-MM-dd-HH-mm-ss')
         Write-Verbose -Message $string
 
         # Set the date prefix is present
         if($addDate) {
-            $string = "$($(Get-Date).ToString('yyyy-MM-dd-HH-mm-ss')): $string"
+            $string = "$($dateTime): $string"
+        }
+
+        if($file.length -eq 0){
+            $file = "$script:functionsPath\..\logs\$date.log"
         }
 
         # Create the logfile if it doesn't exist
@@ -73,10 +80,6 @@ Function Write-Log ([string]$string, [switch]$addDate=$True, [string]$file = ".\
 
         # Write the string to the logfile
         Add-Content $file -value "$string" -Force
-
-    # Insert an empty line if the string is blank
-    } else {
-        Add-Content $file -value ""
     }
 }
 
@@ -102,3 +105,34 @@ Function Send-SmtpEmail {
     -Body $Body -SmtpServer $SMTPServer -port $SMTPPort -UseSsl `
     -Credential (Get-Credential) -Attachments $Attachment
 }
+
+
+<# -----------------------------------------------------------------------------
+   -----------------------------------------------------------------------------
+    LEGACY POWERSHELL HACKS
+    Attempt to fill in the gaps of missing functions for PowerShell v1 or v2.
+----------------------------------------------------------------------------- 
+----------------------------------------------------------------------------- #>
+if(Get-PowershellVersion -lt 3) {
+    
+    <# -------------------------------------------------------------------------
+        Powershell 2 does NOT have the ConvertTo-Json commandlet
+    ------------------------------------------------------------------------- #>
+    function ConvertTo-Json ([object]$object) {
+        add-type -assembly system.web.extensions
+        $ps_js=new-object system.web.script.serialization.javascriptSerializer
+        return $ps_js.Serialize($object)
+    }
+
+
+    <# -------------------------------------------------------------------------
+        Powershell 2 does NOT have the ConvertFrom-Json commandlet
+    ------------------------------------------------------------------------- #>
+    function ConvertFrom-Json ([object]$object) {
+        add-type -assembly system.web.extensions
+        $ps_js=new-object system.web.script.serialization.javascriptSerializer
+        return $ps_js.DeserializeObject($object)
+    }
+}
+
+
