@@ -49,6 +49,7 @@ $scriptPath = Split-Path -Parent -Path $MyInvocation.MyCommand.Definition
     Set variables.
 ----------------------------------------------------------------------------- #>
 $targetDateTime = (Get-Date).AddDays(-$targetDaysOld)
+$count = 0
 
 
 <# -----------------------------------------------------------------------------
@@ -57,19 +58,23 @@ $targetDateTime = (Get-Date).AddDays(-$targetDaysOld)
 Function Remove-Logfiles {
     # Iterate and count
     $files = Get-ChildItem $targetDir -Recurse | Where-Object { -not $_.PSIsContainer -and $_.LastWriteTime -lt $targetDateTime }
-    $script:count = $files.Count
 
-    # Perform the removal
-    Get-ChildItem $targetDir -Recurse | Where-Object { -not $_.PSIsContainer -and $_.LastWriteTime -lt $targetDateTime } | Remove-Item
+    if($files.Count -gt 0){
+        # Perform the removal
+        Get-ChildItem $targetDir -Recurse | Where-Object { -not $_.PSIsContainer -and $_.LastWriteTime -lt $targetDateTime } | Remove-Item
+        $script:count = $files.Count
+    }
 }
 
 
 <# -----------------------------------------------------------------------------
     Run.
 ----------------------------------------------------------------------------- #>
-Write-Host "Starting script"
+Write-Log "-----------------------------------------------------------"
+Write-Log "Starting log-roller script"
 Remove-Logfiles
-Write-Host "Parsed $targetDir ..."
-Write-Host "Removed log files older than $targetDateTime."
-Write-Host "$script:count files removed"
-Write-Host "Ending script"
+Write-Log "Parsed $targetDir ..."
+Write-Log "Removed log files older than $targetDateTime."
+Write-Log "$count files removed"
+Write-Log "Ending log-roller script"
+Write-Log "-----------------------------------------------------------"
