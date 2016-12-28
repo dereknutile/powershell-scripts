@@ -26,7 +26,7 @@
 [CmdletBinding()]
 Param(
     [Parameter(Mandatory=$False)]
-    [string]$inputFile = "$(Split-Path -Parent -Path $MyInvocation.MyCommand.Definition) \input.log",
+    [string]$inputFile = "$(Split-Path -Parent -Path $MyInvocation.MyCommand.Definition)\input.log",
 
     [Parameter(Mandatory=$False)]
     [string]$outputFile = "$(Split-Path -Parent -Path $MyInvocation.MyCommand.Definition)\$(Get-Date -Format yyyy-M-d-H-m-s)-output.log"

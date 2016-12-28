@@ -30,13 +30,13 @@ Param(
     [string]$serverName = $env:computerName,
 
     [Parameter(Mandatory=$False)]
-    [string]$csvFile = (Get-Item -Path ".\rules.csv" -Verbose).FullName,
+    [string]$csvFile = "$(Split-Path -Parent -Path $MyInvocation.MyCommand.Definition)\rules.csv",
 
     [Parameter(Mandatory=$False)]
     [string]$webSiteName = "Default Web Site",
 
     [Parameter(Mandatory=$False)]
-    [string]$logFile = ".\logfile.log",
+    [string]$logFile = "$(Split-Path -Parent -Path $MyInvocation.MyCommand.Definition)\logfile.log",
     
     [switch]$Force = $False
 )
