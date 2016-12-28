@@ -26,10 +26,10 @@
 [CmdletBinding()]
 Param(
     [Parameter(Mandatory=$False)]
-    [string]$inputFile = (Get-Item -Path ".\input.log" -Verbose).FullName,
+    [string]$inputFile = "$(Split-Path -Parent -Path $MyInvocation.MyCommand.Definition) \input.log",
 
     [Parameter(Mandatory=$False)]
-    [string]$outputFile = ".\$(Get-Date -Format yyyy-M-d-H-m-s)-output.log"
+    [string]$outputFile = "$(Split-Path -Parent -Path $MyInvocation.MyCommand.Definition)\$(Get-Date -Format yyyy-M-d-H-m-s)-output.log"
 )
 
 
@@ -43,7 +43,7 @@ $scriptPath = Split-Path -Parent -Path $MyInvocation.MyCommand.Definition
 <# -----------------------------------------------------------------------------
     Set variables.
 ----------------------------------------------------------------------------- #>
-$config = Get-Configuration config.json
+$config = Get-Configuration "$scriptPath\config.json"
 $attributes = $config.attributes
 $outputString = ""
 $counter = 0
@@ -74,6 +74,11 @@ Function Parse-File ([string]$file)  {
 <# -----------------------------------------------------------------------------
     Run.
 ----------------------------------------------------------------------------- #>
+Write-Log "-----------------------------------------------------------"
+Write-Log "Starting log-ripper script"
+Write-Log "Parsing $inputFile to $outputFile"
 Parse-File $inputFile
 $outputString | Set-Content $outputFile
-Write-Host "$counter lines parsed with $hits matches from $inputFile."
+Write-Log "$counter lines parsed with $hits matches."
+Write-Log "Ending log-ripper script"
+Write-Log "-----------------------------------------------------------"
